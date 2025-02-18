@@ -1,0 +1,32 @@
+###############################################################
+# Load Balancing Per Connection Clasifier (LB PCC) Script Generator
+# Date/Time: 18/02/2025, 14:55:13
+# Created by: buananet.com - fb.me/buananet.pbun
+# Load Balancing Method -> PCC (PER CONNECTION CLASIFIER)
+###############################################################
+/ip firewall address-list
+add address=192.168.0.0/16 list=LOCAL-IP comment="LB PCC by buananet.com"
+add address=172.16.0.0/12 list=LOCAL-IP comment="LB PCC by buananet.com"
+add address=10.0.0.0/8 list=LOCAL-IP comment="LB PCC by buananet.com"
+/ip firewall nat
+add chain=srcnat out-interface="(isp1)" action=masquerade comment="LB PCC by buananet.com"
+add chain=srcnat out-interface="(isp2)" action=masquerade comment="LB PCC by buananet.com"
+/ip route
+add check-gateway=ping distance=1 gateway="Gateway ISP-1" routing-mark="to-(isp1)" comment="LB PCC by buananet.com"
+add check-gateway=ping distance=1 gateway="Gateway ISP-2" routing-mark="to-(isp2)" comment="LB PCC by buananet.com"
+add check-gateway=ping distance=1 gateway="Gateway ISP-1" comment="LB PCC by buananet.com"
+add check-gateway=ping distance=2 gateway="Gateway ISP-2" comment="LB PCC by buananet.com"
+/ip firewall mangle
+add action=accept chain=prerouting dst-address-list=LOCAL-IP src-address-list=LOCAL-IP comment="LB PCC by buananet.com"
+add action=accept chain=postrouting dst-address-list=LOCAL-IP src-address-list=LOCAL-IP comment="LB PCC by buananet.com"
+add action=accept chain=forward dst-address-list=LOCAL-IP src-address-list=LOCAL-IP comment="LB PCC by buananet.com"
+add action=accept chain=input dst-address-list=LOCAL-IP src-address-list=LOCAL-IP comment="LB PCC by buananet.com"
+add action=accept chain=output dst-address-list=LOCAL-IP src-address-list=LOCAL-IP comment="LB PCC by buananet.com"
+add action=mark-connection chain=input in-interface="(isp1)" new-connection-mark="cm-(isp1)" passthrough=yes comment="LB PCC by buananet.com"
+add action=mark-connection chain=input in-interface="(isp2)" new-connection-mark="cm-(isp2)" passthrough=yes comment="LB PCC by buananet.com"
+add action=mark-routing chain=output connection-mark="cm-(isp1)" new-routing-mark="to-(isp1)" passthrough=yes comment="LB PCC by buananet.com"
+add action=mark-routing chain=output connection-mark="cm-(isp2)" new-routing-mark="to-(isp2)" passthrough=yes comment="LB PCC by buananet.com"
+add action=mark-connection chain=prerouting dst-address-type=!local new-connection-mark="cm-(isp1)" passthrough=yes per-connection-classifier=both-addresses-and-ports:2/0 dst-address-list=!LOCAL-IP src-address-list=LOCAL-IP comment="LB PCC by buananet.com"
+add action=mark-connection chain=prerouting dst-address-type=!local new-connection-mark="cm-(isp2)" passthrough=yes per-connection-classifier=both-addresses-and-ports:2/1 dst-address-list=!LOCAL-IP src-address-list=LOCAL-IP comment="LB PCC by buananet.com"
+add action=mark-routing chain=prerouting connection-mark="cm-(isp1)" new-routing-mark="to-(isp1)" passthrough=yes dst-address-list=!LOCAL-IP src-address-list=LOCAL-IP comment="LB PCC by buananet.com"
+add action=mark-routing chain=prerouting connection-mark="cm-(isp2)" new-routing-mark="to-(isp2)" passthrough=yes dst-address-list=!LOCAL-IP src-address-list=LOCAL-IP comment="LB PCC by buananet.com"
