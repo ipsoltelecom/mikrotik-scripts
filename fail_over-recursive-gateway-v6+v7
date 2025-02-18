@@ -1,0 +1,9 @@
+#############################################################
+# MIKROTIK FAILOVER CHECK GATEWAY, RECUSIVE, NETWATCH GENERATOR
+# Date/Time: 18/02/2025, 15:08:13
+# Created By: buananet.com - fb.me/buananet.pbun
+# Failover Method -> CHECK GATEWAY
+#############################################################
+/ip route
+add dst-address="0.0.0.0/0" target-scope="10" distance="1" gateway="Gateway ISP-1" comment="ISP-1" check-gateway="ping" scope="30"
+add dst-address="0.0.0.0/0" target-scope="10" distance="2" gateway="Gateway ISP-2" comment="ISP-2" check-gateway="ping" scope="30"
